@@ -1,24 +1,33 @@
 <script setup lang="ts">
+import { useUserStore } from '../stores/user';
+import { useRouter } from 'vue-router';
+import { ref } from 'vue';
+import { AuthApi } from '../api/authapi';
+
+const userStore = useUserStore();
+const router = useRouter();
+
+const username = ref('');
+const password = ref('');
+
+const HandleLogin = async () => {
+    const userdata = await AuthApi.login(username.value, password.value)
+    if (userdata) {
+        userStore.login(userdata);
+        router.push('/home');
+    }
+    console.log("로그인 실패함.")
+}
 </script>
 
 <template>
     <div class="login">
         <div class="login-container">
             <div class="login-form">
-                <h1>로그인</h1>
-                <form>
-                    <div class="input-group">
-                        <label for="username">이메일</label>
-                        <input type="username" id="username" name="username" />
-                    </div>
-                    <div class="input-group">
-                        <label for="password">비밀번호</label>
-                        <input type="password" id="password" name="password" />
-                    </div>
-                    <div class="input-group">
-                        <button type="submit">로그인</button>
-                    </div>
-                </form>
+                <h1>Login</h1>
+                <input v-model="username" type="text" placeholder="id" />
+                <input v-model="password" type="password" placeholder="Password" />
+                <button @click="HandleLogin">Login</button>
             </div>
         </div>
     </div>
@@ -39,6 +48,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: #D9EAD3;
 }
 
 .login-form {
@@ -48,7 +58,8 @@
     flex-direction: column;
     gap: 10px;
     padding: 1rem;
-    border: 1px solid #E0E0E0;
+    background-color: white;
+    border: 4px solid #50B498;
     border-radius: 8px;
     box-sizing: border-box;
 }

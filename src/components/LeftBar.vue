@@ -1,8 +1,10 @@
 <script setup lang="ts">
+import { useUserStore } from '../stores/user';
 import NavItem from './NavItem.vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const userStore = useUserStore();
 const home = () => router.push('/');
 
 const onCompose = () => {
@@ -51,8 +53,8 @@ const onProfileClick = () => {
             <img class="profile-pic" src="../assets/noneProfile.png" alt="Profile Picture" />
           </div>
           <div class="profile-details">
-            <span class="profile-name" @click.stop="onProfileNameClick">사용자 이름</span>
-            <span class="profile-id" @click.stop="onProfileIdClick">@user_id</span>
+            <span class="profile-name" @click.stop="onProfileNameClick">{{ userStore.user?.nickname }}</span>
+            <span class="profile-id" @click.stop="onProfileIdClick">@{{ userStore.user?.username }}</span>
           </div>
         </div>
       </div>
