@@ -1,53 +1,42 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref } from 'vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
 import { ArticleApi } from '../api/articleapi';
-import ArticleCard from '../components/ArticleCard.vue';
 import { Article } from '../model/article';
 
+// Import components
+import ArticleCard from '../components/ArticleCard.vue';
+import InfiniteObserver from '../components/InfiniteObserver.vue';
+
+// Variables
 const articles = ref<Article[]>([]);
-const loading = ref(false);
-const observer = ref<IntersectionObserver | null>(null);
+const isLoading = ref(false);
+const isLastPage = ref<boolean>(false);
 let currentPage = 1;
 const perPage = 5;
-let observerDisconnected = false;
 
-const loadMoreArticles = async () => {
-  loading.value = true;
+const loadMoreArticles = async () => { // 새로운 글을 백엔드에서 가져오는 함수
+  // 로딩 시작
+  isLoading.value = true;
+
+  // 백엔드에서 글 가져오기
   const RecentArticles = await ArticleApi.getRecentArticles(currentPage, perPage);
   
-  if (RecentArticles.length === 0) {
-      console.log("옵저버 해제");
-      observer.value?.disconnect();
-      observerDisconnected = true;
-      loading.value = false;
-      return;
+  // 글이 없을 때
+  if (RecentArticles.length === 0) { // 더 이상 글이 없을 때
+    isLoading.value = false;
+    isLastPage.value = true;
+    return;
   }
-  articles.value.push(...RecentArticles);
-  currentPage++;
-  loading.value = false;
-  if (!observerDisconnected) {
-    await nextTick();
-    if (observer.value) {
-      observer.value.observe(document.querySelector('.load-more')!);
-    }
-  }
+
+  // 글이 있을 때
+  articles.value.push(...RecentArticles); // 기존 글에 새로운 글 추가
+  currentPage++; // 다음 페이지로 이동
+  // 로딩 끝
+  isLoading.value = false;
 };
-
-const observeLoadMore = (entries: IntersectionObserverEntry[]) => {
-  if (entries[0].isIntersecting && !loading.value) {
-    loadMoreArticles();
-  }
-};
-
-onMounted(() => {
-  observer.value = new IntersectionObserver(observeLoadMore);
-  observer.value.observe(document.querySelector('.load-more')!);
-  loadMoreArticles();
-});
-
-onBeforeUnmount(() => {
-  observer.value?.disconnect();
-});
 </script>
 
 <template>
@@ -62,8 +51,9 @@ onBeforeUnmount(() => {
         :createdAt="article.createdAt"
         :updatedAt="article.updatedAt"
       />
-      <div class="load-more" v-if="loading">Loading...</div>
-      <div class="load-more" v-else>마지막 글 입니다.</div>
+      <InfiniteObserver @show="loadMoreArticles" v-if="!isLastPage" />
+      <FontAwesomeIcon v-if="isLoading" class="loading-icon" :icon="faSpinner" spin />
+      <div v-if="isLastPage" class="no-more" >더 이상 티클이 없습니다.</div>
     </div>
   </div>
 </template>
@@ -82,7 +72,14 @@ onBeforeUnmount(() => {
   padding: 1rem;
 }
 
-.load-more {
-  height: 20px;
+.loading-icon {
+  font-size: 2rem;
+  margin: 1rem auto;
+}
+
+.no-more {
+  font-size: 1.5rem;
+  text-align: center;
+  margin: 1rem auto;
 }
 </style>
