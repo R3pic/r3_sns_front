@@ -5,14 +5,12 @@ import Search from '../views/Search.vue';
 import Notifications from '../views/Notifications.vue';
 import Profile from '../views/Profile.vue';
 import Login from '../views/Login.vue';
-import { useCookies } from 'vue3-cookies';
-
 const routes = [
   { path: '/', component: Login },
   { path: '/home', name: 'Home', component: Home },
   { path: '/search', name: 'Search', component: Search },
   { path: '/notifications', name: 'Notifications', component: Notifications },
-  { path: '/profile', name: 'Profile', component: Profile },
+  { path: '/:username', name: 'Profile', component: Profile },
 ];
 
 const router = createRouter({
@@ -22,7 +20,6 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
-  const { cookies } = useCookies();
   
   if (to.path !== '/' && !userStore.isLoggedIn) {
     console.log('User is not logged in');

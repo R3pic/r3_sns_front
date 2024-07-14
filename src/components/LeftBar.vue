@@ -38,7 +38,7 @@ const onProfileClick = () => {
         <NavItem label="홈" route="/" />
         <NavItem label="검색" route="/search" />
         <NavItem label="알림" route="/notifications" />
-        <NavItem label="프로필" route="/profile" />
+        <NavItem label="프로필" :route="`${userStore.user?.username}`" />
       </div>
       
       <div class="footer">

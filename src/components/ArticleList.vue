@@ -17,11 +17,15 @@ const isLastPage = ref<boolean>(false);
 let currentPage = 1;
 const perPage = 5;
 
+const props = defineProps<{
+    fetchArticles: (page: number, perPage: number) => Promise<Article[]>;
+}>();
+
 const loadMoreArticles = async () => {
     try {
         isLoading.value = true;
 
-        const RecentArticles = await ArticleApi.getRecentArticles(currentPage, perPage);
+        const RecentArticles = await props.fetchArticles(currentPage, perPage);
         
         if (RecentArticles.length === 0) {
             isLoading.value = false;
