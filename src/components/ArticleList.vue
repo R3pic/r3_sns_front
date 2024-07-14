@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
-import { ArticleApi } from '../api/articleapi';
 import { Article } from '../model/article';
 
 // Import components
