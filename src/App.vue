@@ -39,6 +39,7 @@ onMounted(() => {
 }
 
 .container {
+  height: 100%;
   flex: 1;
   display: flex;
   align-items: start;
