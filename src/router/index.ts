@@ -18,7 +18,7 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
   
   if (to.path !== '/' && !userStore.isLoggedIn) {
