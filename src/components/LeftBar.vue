@@ -1,14 +1,20 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { useUserStore } from '../stores/user';
 import NavItem from './NavItem.vue';
+import PostModal from './PostModal.vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const userStore = useUserStore();
+
+const showComposeModal = ref(false);
+
 const home = () => router.push('/');
 
 const onCompose = () => {
   console.log('게시글 작성 요청');
+  showComposeModal.value = true;
 }
 
 const onProfileNameClick = () => {
@@ -47,7 +53,7 @@ const onProfileClick = () => {
             <span>티클 작성</span>
           </div>
         </div>
-
+        
         <div class="profile" @click="onProfileClick">
           <div class="profile-pic-box" @click.stop="onProfilePicClick">
             <img class="profile-pic" src="../assets/noneProfile.png" alt="Profile Picture" />
@@ -59,6 +65,7 @@ const onProfileClick = () => {
         </div>
       </div>
     </div>
+    <PostModal v-if="showComposeModal" @close="() => showComposeModal = false"/>
 </template>
 
 <style scoped>
