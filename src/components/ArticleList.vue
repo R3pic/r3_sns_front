@@ -14,11 +14,21 @@ const articles = ref<Article[]>([]);
 const isLoading = ref(false);
 const isLastPage = ref<boolean>(false);
 let currentPage = 1;
-const perPage = 5;
+const perPage = 10;
 
 const props = defineProps<{
     fetchArticles: (page: number, perPage: number) => Promise<Article[]>;
 }>();
+
+
+const resetArticles = async () => {
+    articles.value = [];
+    currentPage = 1;
+    isLastPage.value = false;
+    await loadMoreArticles();
+};
+
+defineExpose({resetArticles});
 
 const loadMoreArticles = async () => {
     try {

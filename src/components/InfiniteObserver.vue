@@ -8,8 +8,10 @@ const createObserver = () => {
     const observer = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting) {
             emits('show');
+            console.log('show');
         } else {
-            emits('hide')
+            emits('hide');
+            console.log('hide');
         }
     });
     observer.observe(observerElement.value as Element);
