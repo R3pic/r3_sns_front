@@ -48,8 +48,7 @@ onMounted(() => {
 
 .content {
   margin-left: 220px;
-  margin-right: 40%;
-  width: calc(100% - 250px);
+  width: calc(80% - 250px);
   height: 100%;
   background-color: #D6EFD8;
 }

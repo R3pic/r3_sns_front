@@ -20,7 +20,7 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const userStore = useUserStore();
-  
+
   if (to.path !== '/' && !userStore.isLoggedIn) {
     console.log('User is not logged in');
     next('/');

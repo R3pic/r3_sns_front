@@ -1,21 +1,55 @@
 <script setup lang="ts">
-import { defineEmits, ref } from 'vue';
+import { computed, ref} from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-
+import { faImage } from '@fortawesome/free-regular-svg-icons/faImage';
+import { ArticleApi } from '../api/articleapi';
 const emit = defineEmits(['close']);
 
 const postContent = ref('');
+const uploadedimage = ref<HTMLInputElement>();
+const on_mage_upload_btn_click = () => uploadedimage.value?.click();
 
+// 게시하기 버튼을 눌렀을 때
+const post = async () => {
+  if (postContent.value.length < 5) {
+    alert('게시글 내용을 입력해주세요.');
+    return;
+  }
+  
+  const PostedArticle = await ArticleApi.postArticle(postContent.value);
+  
+  if (!PostedArticle) {
+    alert('게시글 작성에 실패했습니다.');
+    return;
+  }
+  
+  emit('close');
+};
+
+const handleImageUpload = (event: Event) => {
+  console.log('유저가 이미지를 업로드함');
+}
+// 디자인 관련
+const maxContentLength = 180;
+// 텍스트 박스 높이 자동 조절
 const adjustTextareaHeight = (event: Event) => {
   const textarea = event.target as HTMLTextAreaElement;
   textarea.style.height = 'auto';
   textarea.style.height = `${textarea.scrollHeight}px`;
 };
-
-const post = () => {
-  console.log(`게시글 내용: ${postContent.value}`);
-};
+// 게시글 글자수 인디케이터
+const contentLengthStyle = computed(() => {
+  const maxLength = 180;
+  const contentLength = postContent.value.length;
+  if (contentLength < maxLength * 0.5) {
+    return { color: 'black' };
+  } else if (contentLength < maxLength * 0.8) {
+    return { color: 'orange' };
+  } else {
+    return { color: 'red' };
+  }
+});
 </script>
 
 <template>
@@ -26,18 +60,36 @@ const post = () => {
           <FontAwesomeIcon :icon="faTimes" />
         </button>
       </div>
+
       <div class="modal-content">
         <img class="user-thumbnail" src="../assets/noneProfile.png" alt="Profile Picture" />
         <textarea 
+          spellcheck="false"
           class="post-textarea" 
           placeholder="오늘은 어떤 일이 있었나요?" 
           rows="1" 
           v-model="postContent"
           @input="adjustTextareaHeight"
-        ></textarea>
+        >
+          <div class="upload-image-preview">
+            <img v-for="(image, index) in imageList" :src="image" :key="index" class="image-preview"/>
+          </div>
+        </textarea>
       </div>
+
       <div class="modal-footer">
-        <button class="post-button">게시하기</button>
+        <div class="footer-left">
+          <div class="image-upload-button" @click="on_mage_upload_btn_click">
+            <FontAwesomeIcon :icon="faImage"/>
+          </div>
+          <input ref="uploadedimage" type="file" style="display: none" multiple @change="handleImageUpload"/>
+        </div>
+        <div class="footer-right">
+          <div class="content-length-progress">
+            <span :style="contentLengthStyle">{{ maxContentLength - postContent.length }}</span>
+          </div>
+          <button class="post-button" @click="post">게시하기</button>
+        </div>
       </div>
     </div>
   </div>
@@ -55,6 +107,7 @@ const post = () => {
     align-items: flex-start;
     justify-content: center;
     padding-top: 50px;
+    z-index: 1000;
   }
 
   .modal-window {
@@ -66,15 +119,7 @@ const post = () => {
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
-    max-width: 90%;
     overflow: hidden;
-  }
-
-  @media screen and (max-width: 768px) {
-    .modal-window {
-      width: 90vw;
-    }
-    
   }
 
   .modal-header {
@@ -121,12 +166,46 @@ const post = () => {
 
   .modal-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     padding: 0.5rem;
     border-top: 1px solid #ccc;
     background-color: #f5f5f5;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+  }
+
+  .footer-left {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .image-upload-button {
+    border-radius: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .image-upload-button:hover {
+    background-color: #d0d0d0;
+  }
+
+  .footer-right {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .content-length-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .content-length-progress span {
+    transition: color 0.5s;
   }
 
   .post-button {
